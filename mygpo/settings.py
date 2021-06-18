@@ -185,6 +185,7 @@ INSTALLED_APPS = [
     "mygpo.votes",
 ]
 
+
 try:
     if DEBUG:
         import debug_toolbar
@@ -207,6 +208,7 @@ except ImportError:
 
 
 ACCOUNT_ACTIVATION_DAYS = int(os.getenv("ACCOUNT_ACTIVATION_DAYS", 7))
+
 
 AUTHENTICATION_BACKENDS = (
     "mygpo.users.backend.CaseInsensitiveModelBackend",
