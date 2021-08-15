@@ -70,7 +70,7 @@ if _cache_used:
 # although not all choices may be available on all operating systems.
 # If running in a Windows environment this must be set to the same as your
 # system time zone.
-TIME_ZONE = "UTC"
+TIME_ZONE = os.getenv("TIME_ZONE", "UTC")
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
@@ -381,6 +381,14 @@ INTERNAL_IPS = os.getenv("INTERNAL_IPS", "").split()
 EMAIL_BACKEND = os.getenv(
     "EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend"
 )
+
+EMAIL_HOST = os.getenv("EMAIL_HOST", "")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
+EMAIL_PORT = os.getenv("EMAIL_PORT", 25)
+EMAIL_USE_LOCALTIME = get_bool("EMAIL_USE_LOCALTIME", False)
+EMAIL_USE_TLS = get_bool("EMAIL_USE_TLS", False)
+EMAIL_USE_SSL = get_bool("EMAIL_USE_SSL", False)
 
 PODCAST_AD_ID = os.getenv("PODCAST_AD_ID")
 
