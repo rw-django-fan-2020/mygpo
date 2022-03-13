@@ -22,7 +22,7 @@ SEARCH_CUTOFF = settings.SEARCH_CUTOFF
 
 
 def search_podcasts(query):
-    """ Search for podcasts according to 'query' """
+    """Search for podcasts according to 'query'"""
     if is_query_too_short(query):
         logger.debug('Found no podcasts for "{query}". Query is too short', query=query)
         return Podcast.objects.none()
@@ -40,6 +40,7 @@ def search_podcasts(query):
         )
         .filter(rank__gte=SEARCH_CUTOFF)
         .order_by("-order")[:100]
+        .prefetch_related("slugs")
     )
 
     logger.debug(

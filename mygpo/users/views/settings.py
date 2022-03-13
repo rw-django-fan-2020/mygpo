@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.contrib.auth import logout
@@ -20,6 +20,7 @@ from mygpo.decorators import allowed_methods
 from mygpo.web.forms import UserAccountForm, ProfileForm
 from mygpo.web.utils import normalize_twitter
 from mygpo.users.settings import PUBLIC_SUB_USER, PUBLIC_SUB_PODCAST
+from mygpo.users.models import UserProfile
 
 
 @login_required
@@ -91,7 +92,7 @@ def account(request):
 
 
 class ProfileView(View):
-    """ Updates the public profile and redirects back to the account view """
+    """Updates the public profile and redirects back to the account view"""
 
     def post(self, request):
         user = request.user
@@ -105,17 +106,19 @@ class ProfileView(View):
                 )
             )
 
-        request.user.twitter = normalize_twitter(form.cleaned_data["twitter"])
-        request.user.about = strip_tags(form.cleaned_data["about"])
+        # Retrieve user profile for request associated user
+        user_profile = get_object_or_404(UserProfile, user=request.user)
+        user_profile.twitter = normalize_twitter(form.cleaned_data["twitter"])
+        user_profile.about = strip_tags(form.cleaned_data["about"])
 
-        request.user.save()
+        user_profile.save()
         messages.success(request, _("Data updated"))
 
         return HttpResponseRedirect(reverse("account") + "#profile")
 
 
 class AccountRemoveGoogle(View):
-    """ Removes the connected Google account """
+    """Removes the connected Google account"""
 
     @method_decorator(login_required)
     def post(self, request):
@@ -179,7 +182,11 @@ def privacy(request):
     site = RequestSite(request)
     user = request.user
 
-    podcasts = Podcast.objects.filter(subscription__user=user).distinct("pk")
+    podcasts = (
+        Podcast.objects.filter(subscription__user=user)
+        .distinct("pk")
+        .prefetch_related("slugs")
+    )
     private = UserSettings.objects.get_private_podcasts(user)
 
     subscriptions = []

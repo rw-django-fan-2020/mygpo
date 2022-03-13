@@ -64,6 +64,7 @@ def create_subscriptionlist(request):
         Subscription.objects.filter(user=user)
         .exclude(deleted=True)
         .select_related("podcast", "client")
+        .prefetch_related("podcast__slugs")
     )
 
     # grou clients by subscribed podcasts
@@ -100,7 +101,7 @@ def subscriptions_feed(request, username):
 
 
 class SubscriptionsFeed(Feed):
-    """ A feed showing subscription changes for a certain user """
+    """A feed showing subscription changes for a certain user"""
 
     NUM_ITEMS = 20
 
